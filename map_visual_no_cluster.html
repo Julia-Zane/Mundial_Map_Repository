@@ -19,9 +19,9 @@
   <script>
     function getQueryParams() {
       const params = new URLSearchParams(window.location.search);
-      const lat = params.get('lat').split(',');
-      const lng = params.get('lng').split(',');
-      const date = params.get('date').split(',');
+      const lat = params.get('lat') ? params.get('lat').split(',') : [];
+      const lng = params.get('lng') ? params.get('lng').split(',') : [];
+      const date = params.get('date') ? params.get('date').split(',') : [];
       console.log("Latitudes: ", lat);
       console.log("Longitudes: ", lng);
       console.log("Dates: ", date);
@@ -30,12 +30,27 @@
 
     function updateMap() {
       const { lat, lng, date } = getQueryParams();
-      if (!lat || !lng || !date) {
-        console.error("Invalid parameters");
+      if (lat.length === 0 || lng.length === 0 || date.length === 0) {
+        console.error("Invalid or missing parameters");
         return;
       }
 
       // Initialize the map
       const map = L.map('map').setView([-22.9068, -43.1729], 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // Add markers to the map based on parameters
+      for (let i = 0; i < lat.length; i++) {
+        if (lat[i] && lng[i] && date[i]) {
+          console.log(`Adding marker at (${lat[i]}, ${lng[i]}) with date ${date[i]}`);
+          L.marker([lat[i], lng[i]]).addTo(map).bindPopup(`Location: (${lat[i]}, ${lng[i]})`);
+        }
+      }
+    }
+
+    window.onload = updateMap;
+  </script>
+</body>
+</html>
